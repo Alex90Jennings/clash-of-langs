@@ -1,0 +1,11 @@
+cabal-version:      3.0
+name:               harness
+version:            0.1.0
+build-type:         Simple
+
+executable harness
+    main-is:          Main.hs
+    hs-source-dirs:   .
+    default-language: GHC2021
+    ghc-options:      -O2 -rtsopts -fno-full-laziness
+    build-depends:    base, bytestring, text, containers, unordered-containers, aeson, regex-tdfa, vector, vector-algorithms, deepseq

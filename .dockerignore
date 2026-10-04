@@ -1,0 +1,20 @@
+node_modules
+.next
+.git
+docs
+*.md
+# local build outputs — the image builds everything itself
+bench/*/bin
+bench/*/dist
+bench/*/out
+bench/*/obj
+bench/*/ebin
+bench/*/lib
+bench/*/target
+bench/haskell/dist-newstyle
+bench/zig/.zig-cache
+bench/scala/.scala-build
+bench/scala/.bsp
+bench/lua/rocks
+bench/r/*.so
+bench/r/*.o

@@ -1,0 +1,33 @@
+node_modules
+.next
+out
+next-env.d.ts
+*.tsbuildinfo
+bench/ts/dist
+bench/go/bin
+bench/rust/target
+bench/java/out
+bench/java/lib/*.jar
+.env*.local
+bench/rust/bin
+# build outputs for the second wave of fighters
+bench/*/bin
+bench/csharp/dist
+bench/csharp/obj
+bench/erlang/ebin
+bench/elixir/ebin
+bench/haskell/dist-newstyle
+bench/zig/.zig-cache
+bench/r/*.so
+bench/r/*.o
+bench/r/lib
+bench/lua/rocks
+.vercel
+
+# local crash dumps / agent scaffolding
+erl_crash.dump
+AGENTS.md
+CLAUDE.md
+.env
+bench/scala/.scala-build
+bench/scala/.bsp

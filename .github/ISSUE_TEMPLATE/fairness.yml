@@ -1,0 +1,23 @@
+name: Fairness / implementation issue
+description: An implementation isn't idiomatic, or a comparison isn't fair
+labels: [fairness]
+body:
+  - type: input
+    id: lang
+    attributes:
+      label: Language and challenge
+      placeholder: python / json
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's unfair or not idiomatic?
+      description: Link to the code in bench/<lang>/ and explain what an experienced developer would write instead.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Timings before and after, docs, or references.

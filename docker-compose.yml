@@ -1,0 +1,19 @@
+services:
+  worker:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    ports:
+      - "8787:8787"
+    environment:
+      CLASHOFLANGS_WORKER_ID: local-docker
+      CLASHOFLANGS_WORKER_TOKEN: ${CLASHOFLANGS_WORKER_TOKEN:-}
+    read_only: true
+    tmpfs:
+      - /tmp:size=512m,exec
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 256
+    mem_limit: 4g
+    cpuset: "2,3"

@@ -1,0 +1,9 @@
+# Vercel only hosts the Next.js app; benchmarks run on the separate worker (see docs/ARCHITECTURE.md).
+bench
+worker
+docs
+scripts
+docker-compose.yml
+.dockerignore
+node_modules
+.next
