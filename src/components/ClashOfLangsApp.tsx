@@ -61,6 +61,14 @@ export function ClashOfLangsApp({
       </main>
       <footer className="statusbar">
         <span>{BRAND.name} · every number is measured, not simulated · scoped to one workload, one implementation, one runtime, one machine, one run</span>
+        <span className="credit">
+          built by{" "}
+          <a href={BRAND.linkedin} target="_blank" rel="noopener noreferrer">{BRAND.author}</a>
+          {" · enjoying it? "}
+          <a href={BRAND.repo} target="_blank" rel="noopener noreferrer">★ star the repo</a>
+          {" · "}
+          <a href={BRAND.contributing} target="_blank" rel="noopener noreferrer">contribute</a>
+        </span>
         <span className="hint">try typing: sudo</span>
       </footer>
       {panel && (

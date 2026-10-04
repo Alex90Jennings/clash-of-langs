@@ -186,6 +186,30 @@ button {
 .hud-nav button[aria-pressed="true"] {
   color: var(--green);
 }
+.hud-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  white-space: nowrap;
+}
+.hud-links a,
+.statusbar a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.hud-links a:hover,
+.hud-links a:focus-visible,
+.statusbar a:hover,
+.statusbar a:focus-visible {
+  color: var(--green);
+  text-shadow: var(--glow);
+}
+.statusbar .credit {
+  flex: none;
+}
+.statusbar .credit a {
+  color: var(--green-dim);
+}
 .hud-spacer {
   flex: 1;
 }
@@ -246,6 +270,7 @@ button {
   z-index: 1;
 }
 .statusbar span:first-child {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -255,8 +280,13 @@ button {
     flex-wrap: wrap;
   }
   .hud-status .label,
-  .statusbar .hint {
+  .statusbar .hint,
+  .statusbar span:first-child {
     display: none;
+  }
+  .statusbar .credit {
+    flex: 1;
+    white-space: normal;
   }
 }
 
