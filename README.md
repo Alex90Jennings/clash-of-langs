@@ -127,6 +127,8 @@ Copy `.env.example` to `.env.local`:
 | `BENCH_WORKER_URL` | *(unset)* | Remote benchmark worker. Leave it unset to run battles in-process. |
 | `CLASHOFLANGS_WORKER_TOKEN` | *(unset)* | Shared secret between the app and the worker. |
 | `CLASHOFLANGS_LOCAL_EXECUTION` | enabled | Set to `0` to turn off in-process execution, for example on a public host. |
+| `CLASHOFLANGS_CPUSET` | `2,3` | Worker only (Docker Compose): the CPU cores the worker is pinned to. Use `0,1` on a 2-core host. |
+| `CLASHOFLANGS_WORKER_ID` | `local-docker` | Worker only: the name shown with every result. |
 
 ### Scripts
 
