@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: worker/Dockerfile
+    restart: unless-stopped
     ports:
       - "127.0.0.1:8787:8787"
     environment:
