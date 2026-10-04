@@ -3,10 +3,11 @@ services:
     build:
       context: .
       dockerfile: worker/Dockerfile
+    restart: unless-stopped
     ports:
-      - "8787:8787"
+      - "127.0.0.1:8787:8787"
     environment:
-      CLASHOFLANGS_WORKER_ID: local-docker
+      CLASHOFLANGS_WORKER_ID: ${CLASHOFLANGS_WORKER_ID:-local-docker}
       CLASHOFLANGS_WORKER_TOKEN: ${CLASHOFLANGS_WORKER_TOKEN:-}
     read_only: true
     tmpfs:
@@ -16,4 +17,4 @@ services:
       - no-new-privileges:true
     pids_limit: 256
     mem_limit: 4g
-    cpuset: "2,3"
+    cpuset: ${CLASHOFLANGS_CPUSET:-2,3}
