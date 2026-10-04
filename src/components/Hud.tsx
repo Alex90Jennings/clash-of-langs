@@ -24,6 +24,11 @@ export function Hud({ panel, onPanel, onHome }: { panel: PanelId | null; onPanel
           </button>
         ))}
       </nav>
+      <nav className="hud-links" aria-label="Project">
+        <a href={BRAND.repo} target="_blank" rel="noopener noreferrer">★ star on github</a>
+        <a href={BRAND.contributing} target="_blank" rel="noopener noreferrer">contribute</a>
+        <a href={BRAND.linkedin} target="_blank" rel="noopener noreferrer">by {BRAND.author} · linkedin</a>
+      </nav>
       <div className="hud-spacer" />
       <div className="hud-status" title={caps?.message ?? caps?.environment?.cpuModel ?? ""}>
         <span className={`dot ${caps === null ? "" : caps.online ? "on" : "off"}`} />
