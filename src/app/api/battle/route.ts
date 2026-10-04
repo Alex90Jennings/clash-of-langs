@@ -1,6 +1,6 @@
 import { parseConfig } from "@/lib/config";
 import type { BattleEvent } from "@/lib/types";
-import { backendMode, WORKER_URL, workerHeaders } from "@/server/backend";
+import { backendMode, clientIp, WORKER_URL, workerHeaders } from "@/server/backend";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,7 +22,11 @@ export async function POST(req: Request) {
   if (mode === "offline") return Response.json({ error: "arena offline: no benchmark worker configured" }, { status: 503 });
 
   if (mode === "remote") {
-    const upstream = await fetch(`${WORKER_URL}/battle`, { method: "POST", headers: workerHeaders(), body: JSON.stringify(parsed.config), signal: req.signal });
+    const upstream = await fetch(`${WORKER_URL}/battle`, { method: "POST", headers: workerHeaders(clientIp(req)), body: JSON.stringify(parsed.config), signal: req.signal });
+    if (upstream.status === 429) {
+      const body = (await upstream.json().catch(() => ({}))) as { error?: string };
+      return Response.json({ error: body.error ?? "too many battles, try again shortly" }, { status: 429, headers: { "retry-after": upstream.headers.get("retry-after") ?? "60" } });
+    }
     if (!upstream.ok || !upstream.body) return Response.json({ error: `worker responded ${upstream.status}` }, { status: 502 });
     return new Response(upstream.body, { headers: SSE_HEADERS });
   }

@@ -6,6 +6,8 @@
 
 Real processes, real runtimes and seeded identical inputs, and every result is checked to be identical before anyone wins.
 
+**[▶ Try it live at clash-of-langs.vercel.app](https://clash-of-langs.vercel.app)**
+
 [![CI](https://github.com/Alex90Jennings/clash-of-langs/actions/workflows/ci.yml/badge.svg)](https://github.com/Alex90Jennings/clash-of-langs/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-00ff66.svg)](LICENSE)
 ![Languages](https://img.shields.io/badge/languages-24-00ff66.svg)
@@ -175,7 +177,8 @@ Without a worker, the deployed UI shows **ARENA OFFLINE** instead of making up n
 - [x] Hardened all-runtimes worker image
 - [ ] Shareable result permalinks and Open Graph result cards
 - [ ] More battlegrounds (ideas welcome: compression, hashing, graph analytics, text tokenisation)
-- [ ] Per-IP rate limiting and an egress firewall for a public deployment
+- [x] Per-visitor rate limiting and a public worker behind HTTPS
+- [ ] Egress firewall on the worker (harnesses never need the network)
 - [ ] gVisor or Firecracker sandboxing, a prerequisite for ever accepting user-submitted code
 
 Ideas and votes are welcome in [issues](https://github.com/Alex90Jennings/clash-of-langs/issues).

@@ -2,12 +2,19 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { timingSafeEqual } from "node:crypto";
 import { ArenaBusyError, runBattle } from "../src/engine/battle";
 import { getEnvironment } from "../src/engine/environment";
+import { BATTLE_LIMITS, RateLimiter } from "../src/engine/rateLimit";
 import { parseConfig } from "../src/lib/config";
 import type { Capabilities } from "../src/lib/types";
 
 const PORT = Number(process.env.PORT ?? 8787);
 const TOKEN = process.env.CLASHOFLANGS_WORKER_TOKEN ?? "";
 const MAX_BODY = 4096;
+const limiter = new RateLimiter(BATTLE_LIMITS);
+
+function clientKey(req: IncomingMessage): string {
+  const forwarded = String(req.headers["x-clashoflangs-client"] ?? "").trim();
+  return forwarded || req.socket.remoteAddress || "unknown";
+}
 
 function authorised(req: IncomingMessage): boolean {
   if (!TOKEN) return true;
@@ -42,6 +49,11 @@ const server = createServer(async (req, res) => {
     if (req.method === "POST" && req.url === "/battle") {
       const parsed = parseConfig((await readBody(req)) as Record<string, unknown>);
       if (!parsed.ok) return json(res, 400, { error: parsed.error });
+      const allowed = limiter.take(clientKey(req));
+      if (!allowed.ok) {
+        res.setHeader("retry-after", String(allowed.retryAfterSec));
+        return json(res, 429, { error: `too many battles from your network, try again in ${allowed.retryAfterSec}s` });
+      }
 
       const abort = new AbortController();
       res.on("close", () => abort.abort());

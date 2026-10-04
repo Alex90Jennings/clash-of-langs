@@ -38,7 +38,9 @@ Recommended hosting: a small dedicated-CPU VM (Hetzner dedicated vCPU, Fly.io `p
 - **Bounded work.** Size/run limits per challenge cap the worst case (e.g. sieve ≤ 100M, ≤ 30 runs). One battle at a time per worker; queue depth 3, then `arena busy`.
 - **Container hardening** (`docker-compose.yml`): non-root user, read-only root FS, tmpfs `/tmp`, all capabilities dropped, `no-new-privileges`, PID and memory limits.
 - **Worker auth.** Shared secret header (`CLASHOFLANGS_WORKER_TOKEN`), constant-time compare. The Next.js API is the only public entry point.
-- **Still to add for public launch:** per-IP rate limiting at the edge (e.g. Vercel firewall / Upstash), egress firewall on the worker (harnesses never need network), and gVisor/Firecracker before accepting any user-provided code.
+- **Rate limiting.** The Next.js API forwards the visitor's IP (from `x-forwarded-for`) in `x-clashoflangs-client`; the worker trusts it only on token-authenticated requests and allows 5 battles per minute and 30 per hour per visitor (`src/engine/rateLimit.ts`), answering `429` with `retry-after` beyond that. One worker process means the counts are exact.
+- **Uptime.** A scheduled GitHub Action (`.github/workflows/uptime.yml`) checks the live site every 30 minutes and fails, which emails the maintainer, if the worker is offline or any runtime is missing.
+- **Still to add:** an egress firewall on the worker (harnesses never need the network), and gVisor/Firecracker before accepting any user-provided code.
 
 ## Code map
 

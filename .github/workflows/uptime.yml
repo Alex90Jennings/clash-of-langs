@@ -1,0 +1,20 @@
+name: Uptime
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  arena:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Live site reports the worker online with every runtime
+        run: |
+          body=$(curl -fsS --retry 3 --retry-delay 20 --max-time 20 https://clash-of-langs.vercel.app/api/capabilities)
+          echo "$body" | jq -e '.online == true' > /dev/null || { echo "::error::arena offline: $(echo "$body" | jq -r '.message // "no message"')"; exit 1; }
+          total=$(echo "$body" | jq '.environment.runtimes | length')
+          online=$(echo "$body" | jq '[.environment.runtimes[] | select(.available)] | length')
+          echo "worker $(echo "$body" | jq -r '.environment.workerId'): $online/$total runtimes online"
+          [ "$online" -eq "$total" ] || { echo "::error::only $online/$total runtimes online"; exit 1; }
