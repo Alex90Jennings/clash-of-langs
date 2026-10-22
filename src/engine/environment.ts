@@ -18,9 +18,24 @@ function isContainer(): boolean {
   }
 }
 
+// Version probes boot JVMs, BEAMs and Julia; launching all of them at once on a small
+// worker starves them past their timeout and they get reported as missing.
+async function probeAll(langs: readonly LanguageId[], limit: number): Promise<[LanguageId, RuntimeInfo][]> {
+  const out: [LanguageId, RuntimeInfo][] = [];
+  let next = 0;
+  const lane = async () => {
+    while (next < langs.length) {
+      const i = next++;
+      out[i] = [langs[i], await probeRuntime(langs[i])];
+    }
+  };
+  await Promise.all(Array.from({ length: limit }, lane));
+  return out;
+}
+
 async function probe(): Promise<WorkerEnvironment> {
-  const entries = await Promise.all(EXECUTABLE_LANGUAGES.map(async (l) => [l, await probeRuntime(l)] as const));
   const cpus = os.cpus();
+  const entries = await probeAll(EXECUTABLE_LANGUAGES, Math.max(2, cpus.length));
   return {
     workerId: process.env.CLASHOFLANGS_WORKER_ID ?? os.hostname(),
     os: `${os.type()} ${os.release()}`,
