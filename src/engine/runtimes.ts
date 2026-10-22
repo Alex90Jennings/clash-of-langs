@@ -1,4 +1,4 @@
-import { execFile } from "node:child_process";
+import { type ExecException, execFile } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -26,14 +26,27 @@ export interface RuntimeAdapter {
 
 const bench = (...p: string[]) => path.join(/*turbopackIgnore: true*/ BENCH_DIR, ...p);
 
+const PROBE_TIMEOUT_MS = 15_000;
+
+class ProbeError extends Error {}
+
+// Rejects with a ProbeError saying why the probe failed, so a slow runtime isn't reported as missing.
 function run(cmd: string, args: string[], pickLine: (lines: string[]) => string | undefined = (l) => l[0]): Promise<string | null> {
-  return new Promise((resolve) => {
-    execFile(cmd, args, { timeout: 15_000 }, (err, stdout, stderr) => {
-      if (err) return resolve(null);
+  return new Promise((resolve, reject) => {
+    execFile(cmd, args, { timeout: PROBE_TIMEOUT_MS }, (err, stdout, stderr) => {
+      if (err) return reject(new ProbeError(probeFailure(cmd, err)));
       const lines = `${stdout}\n${stderr}`.split("\n").map((l) => l.trim()).filter(Boolean);
       resolve(pickLine(lines) ?? null);
     });
   });
+}
+
+function probeFailure(cmd: string, err: ExecException): string {
+  if (err.code === "ENOENT") return `runtime not found: ${cmd}`;
+  if (err.killed) return `version probe timed out after ${PROBE_TIMEOUT_MS / 1000}s: ${cmd}`;
+  if (err.signal) return `version probe killed by ${err.signal}: ${cmd}`;
+  if (typeof err.code === "number") return `version probe exited with code ${err.code}: ${cmd}`;
+  return `version probe failed (${err.code ?? err.message}): ${cmd}`;
 }
 
 const versionFile = (...p: string[]) => async () => {
@@ -179,7 +192,13 @@ export async function probeRuntime(lang: LanguageId): Promise<RuntimeInfo> {
   if (missing) {
     return { available: false, version: null, engine: a.engine, command, build: a.build, reason: `not built: ${path.relative(BENCH_DIR, missing)} (run npm run bench:build)` };
   }
-  const version = await a.version();
-  if (!version) return { available: false, version: null, engine: a.engine, command, build: a.build, reason: `runtime not found: ${a.cmd}` };
+  let version: string | null;
+  try {
+    version = await a.version();
+  } catch (err) {
+    if (!(err instanceof ProbeError)) throw err;
+    return { available: false, version: null, engine: a.engine, command, build: a.build, reason: err.message };
+  }
+  if (!version) return { available: false, version: null, engine: a.engine, command, build: a.build, reason: `no version reported: ${a.cmd}` };
   return { available: true, version, engine: a.engine, command, build: a.build };
 }
